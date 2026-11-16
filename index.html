@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#163a34">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data: blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
-  <title>Trombinoscope de démonstration</title>
+  <title>Trombinoscope</title>
   <link rel="stylesheet" href="./styles.css">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" href="./icon-192.png">
@@ -16,25 +16,29 @@
 <body>
   <header class="hero">
     <div class="wrap">
-      <p class="eyebrow">DÉMONSTRATION SCOLAIRE · V3.4</p>
+      <p class="eyebrow">TROMBINOSCOPE SCOLAIRE · V4.0</p>
       <h1>Trombinoscope</h1>
       <p>Les classes et leurs portraits, sur cet appareil.</p>
     </div>
   </header>
   <main class="wrap">
-    <p class="notice"><strong>Données fictives uniquement.</strong> Cette démonstration est réservée aux fiches et aux photos de test.</p>
+    <p class="notice"><strong>Données chiffrées sur cet iPad.</strong> Aucune sauvegarde n’existe : si le mot de passe est oublié, les données sont perdues.</p>
     <p id="offline" class="small" role="status">Préparation du mode hors ligne…</p>
     <p id="message" role="status" aria-live="polite"></p>
     <section id="locked" class="panel" aria-labelledby="lock-title">
       <h2 id="lock-title">Chargement…</h2>
       <p id="lock-help"></p>
       <form id="unlock" hidden>
-        <label for="password">Mot de passe de test</label>
+        <label for="password">Mot de passe</label>
         <input id="password" type="password" required maxlength="128" autocapitalize="off" spellcheck="false">
+        <div id="confirm-field" hidden>
+          <label for="password-confirm">Confirme le mot de passe</label>
+          <input id="password-confirm" type="password" maxlength="128" autocomplete="new-password" autocapitalize="off" spellcheck="false">
+        </div>
         <button id="unlock-button">Ouvrir</button>
       </form>
       <button id="unlock-passkey" class="secondary" type="button" hidden>Déverrouiller avec une clé d’accès</button>
-      <button id="reset" class="plain" type="button" hidden>Effacer les données de test</button>
+      <button id="reset" class="plain" type="button" hidden>Effacer toutes les données</button>
     </section>
     <section id="unlocked" hidden aria-labelledby="directory-title">
       <div class="section-head">
@@ -60,14 +64,14 @@
           </form>
         </section>
         <section id="student-panel" class="panel" aria-labelledby="student-form-title">
-          <h3 id="student-form-title">Ajouter une fiche fictive</h3>
+          <h3 id="student-form-title">Ajouter une fiche</h3>
           <form id="add-student">
-            <label for="first-name">Prénom fictif</label>
+            <label for="first-name">Prénom</label>
             <input id="first-name" maxlength="50" required autocomplete="off">
             <label for="student-class">Classe</label>
             <select id="student-class"></select>
             <fieldset class="photo-field">
-              <legend>Photo fictive (facultative)</legend>
+              <legend>Photo (facultative)</legend>
               <span id="photo-frame" class="portrait" hidden><img id="photo-preview" alt="Aperçu de la photo" hidden><span class="watermark" aria-hidden="true">CONFIDENTIEL</span></span>
               <div class="actions" aria-describedby="photo-help">
                 <button id="take-photo" class="secondary" type="button">Prendre une photo</button>
@@ -103,14 +107,12 @@
         </div>
         <p id="passkey-status" class="small" role="status"></p>
       </section>
-      <section class="panel test-zone" aria-labelledby="test-title">
-        <h3 id="test-title">Zone de test</h3>
-        <p class="small">Verrouillage automatique après <span id="idle-minutes"></span> minutes sans action. Prochaine purge annuelle : <strong id="purge-date"></strong>.</p>
-        <button id="simulate-year" class="plain" type="button">Simuler le passage au 1er août</button>
-        <p class="small">Ce bouton efface toutes les données de test, comme le ferait la purge annuelle.</p>
+      <section class="panel" aria-labelledby="info-title">
+        <h3 id="info-title">Sécurité</h3>
+        <p class="small">Verrouillage automatique après <span id="idle-minutes"></span> minutes sans action. Effacement automatique de toutes les données le <strong id="purge-date"></strong>, à la première ouverture après cette date.</p>
       </section>
     </section>
-    <noscript>Active JavaScript dans le navigateur pour ouvrir le prototype.</noscript>
+    <noscript>Active JavaScript dans le navigateur pour ouvrir le Trombinoscope.</noscript>
   </main>
 </body>
 </html>

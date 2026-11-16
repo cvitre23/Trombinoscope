@@ -1,6 +1,6 @@
 import {
   schoolYear, openVault, readCurrent, replaceRecord, newSalt,
-  deriveKey, encryptDirectory, decryptDirectory, nextPurge, ageRecord
+  deriveKey, encryptDirectory, decryptDirectory, nextPurge
 } from './vault.js';
 import { createPasskey, readPasskey, protectKey, recoverKey } from './passkey.js';
 
@@ -20,23 +20,12 @@ let photoSelection = 0;
 let passkeySetup;
 let passkeyRequest;
 const idleMinutes = 5;
+const minPassword = 12;
 const pickerGraceMs = 2 * 60 * 1000;
 let idleTimer;
 let pickerOpenedAt = 0;
 let hiddenAt = 0;
 const supportsPasskeys = !!(window.PublicKeyCredential && navigator.credentials);
-
-function demoDirectory() {
-  return [
-    ['CE1 des Étoiles', ['Alba', 'Milo', 'Nino', 'Lila']],
-    ['CM2 des Nuages', ['Olympe', 'Noé', 'Iris', 'Sacha']]
-  ].map(([name, firstNames], group) => ({
-    id: crypto.randomUUID(), name,
-    students: firstNames.map((name, index) => ({
-      id: crypto.randomUUID(), name, avatar: index + group * 4
-    }))
-  }));
-}
 
 function showLock() {
   el('locked').hidden = false;
@@ -44,12 +33,14 @@ function showLock() {
   el('unlock').hidden = !db;
   el('reset').hidden = !record;
   el('unlock-passkey').hidden = !record?.passkey || !supportsPasskeys;
-  el('lock-title').textContent = record ? 'Trombinoscope verrouillé' : 'Créer un espace de test';
+  el('lock-title').textContent = record ? 'Trombinoscope verrouillé' : 'Créer le Trombinoscope';
   el('lock-help').textContent = record
-    ? 'Saisis ton mot de passe de test pour afficher les classes.'
-    : 'Choisis au moins 8 caractères. Deux classes fictives seront ajoutées.';
-  el('unlock-button').textContent = record ? 'Déverrouiller' : 'Créer l’espace de test';
-  el('password').minLength = record ? 1 : 8;
+    ? 'Saisis ton mot de passe pour afficher les classes.'
+    : 'Choisis un mot de passe d’au moins 12 caractères (une phrase facile à retenir convient). Il n’existe aucun moyen de le récupérer.';
+  el('unlock-button').textContent = record ? 'Déverrouiller' : 'Créer le Trombinoscope';
+  el('password').minLength = record ? 1 : minPassword;
+  el('confirm-field').hidden = !!record;
+  el('password-confirm').required = !record;
   el('password').autocomplete = record ? 'current-password' : 'new-password';
 }
 
@@ -89,7 +80,7 @@ function resetStudentForm(student) {
   el('add-student').reset();
   el('first-name').value = student?.name || '';
   fillClassSelect(el('student-class'), activeClass);
-  el('student-form-title').textContent = student ? 'Modifier la fiche' : 'Ajouter une fiche fictive';
+  el('student-form-title').textContent = student ? 'Modifier la fiche' : 'Ajouter une fiche';
   el('save-student').textContent = student ? 'Enregistrer la fiche' : 'Ajouter la fiche';
   el('save-student').disabled = false;
   el('cancel-edit').hidden = !student;
@@ -166,7 +157,7 @@ function showDirectory() {
     remove.textContent = 'Supprimer';
     remove.setAttribute('aria-label', 'Supprimer la fiche de ' + student.name);
     remove.addEventListener('click', () => run(async token => {
-      if (!confirm('Supprimer cette fiche fictive ?')) return;
+      if (!confirm('Supprimer cette fiche ?')) return;
       const next = directory.map(group => group.id === current.id
         ? { ...group, students: group.students.filter(item => item.id !== student.id) }
         : group);
@@ -214,7 +205,7 @@ async function save(next, token, selected, message) {
     lock();
     await refreshRecord();
     showLock();
-    say('Les données ont changé dans une autre fenêtre. Ouvre de nouveau l’espace de test.');
+    say('Les données ont changé dans une autre fenêtre. Ouvre de nouveau le Trombinoscope.');
     return false;
   }
   if (token !== session) return false;
@@ -228,11 +219,12 @@ async function save(next, token, selected, message) {
   return true;
 }
 
-async function unlock(token, password) {
+async function unlock(token, password, confirmation) {
   if (await refreshRecord() || token !== session) return;
   showLock();
   const previous = record;
-  if (!previous && password.length < 8) throw new Error('Choisis au moins 8 caractères.');
+  if (!previous && password.length < minPassword) throw new Error('Choisis au moins ' + minPassword + ' caractères.');
+  if (!previous && password !== confirmation) throw new Error('Les deux mots de passe sont différents.');
   const salt = previous?.salt || newSalt();
   const nextKey = await deriveKey(password, salt);
   if (token !== session) return;
@@ -253,14 +245,14 @@ async function unlock(token, password) {
       return;
     }
   } else {
-    next = demoDirectory();
+    next = [];
     const candidate = await encryptDirectory(next, nextKey, salt, schoolYear());
     if (token !== session) return;
     if (!await replaceRecord(db, undefined, candidate)) {
       await refreshRecord();
       if (token === session) {
         showLock();
-        say('Un espace de test existe déjà. Déverrouille-le.');
+        say('Un Trombinoscope existe déjà. Déverrouille-le.');
       }
       return;
     }
@@ -410,7 +402,7 @@ async function resizeImage(file) {
   const supported = /^image\/(jpeg|png|webp|heic|heif)$/i.test(file.type) ||
     (!file.type && /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name));
   if (!supported || file.size > 25 * 1024 * 1024) {
-    throw new Error('Choisis une photo fictive JPEG, PNG, WebP, HEIC ou HEIF de 25 Mo maximum.');
+    throw new Error('Choisis une photo JPEG, PNG, WebP, HEIC ou HEIF de 25 Mo maximum.');
   }
   const source = URL.createObjectURL(file);
   try {
@@ -479,18 +471,20 @@ el('cancel-edit').addEventListener('click', () => {
 el('unlock').addEventListener('submit', event => {
   event.preventDefault();
   const password = el('password').value;
+  const confirmation = el('password-confirm').value;
   el('password').value = '';
-  run(token => unlock(token, password));
+  el('password-confirm').value = '';
+  run(token => unlock(token, password, confirmation));
 });
 el('reset').addEventListener('click', () => run(async token => {
-  if (!confirm('Effacer définitivement toutes les données de test de cet appareil ?')) return;
+  if (!confirm('Effacer définitivement toutes les classes, fiches et photos de cet iPad ? Cette action est irréversible.')) return;
   if (token !== session) return;
   const deleted = await replaceRecord(db, record?.revision, undefined);
   if (token !== session) return;
   await refreshRecord();
   if (token !== session) return;
   showLock();
-  say(deleted ? 'Données de test effacées.' : 'Les données ont changé. Réessaie.');
+  say(deleted ? 'Toutes les données ont été effacées.' : 'Les données ont changé. Réessaie.');
 }));
 el('lock').addEventListener('click', () => {
   lock();
@@ -563,29 +557,15 @@ el('rename-class').addEventListener('submit', event => {
     await save(next, token, activeClass, 'Classe renommée.');
   });
 });
-el('simulate-year').addEventListener('click', () => run(async token => {
-  if (!confirm('Simuler le 1er août ? Toutes les classes, fiches et photos de test seront effacées.')) return;
-  const revision = record?.revision;
-  lock();
-  if (!await ageRecord(db, revision)) {
-    await refreshRecord();
-    showLock();
-    say('Les données ont changé. Réessaie.');
-    return;
-  }
-  const expired = await refreshRecord();
-  showLock();
-  if (!expired) say('La purge n’a pas eu lieu. Signale ce résultat.');
-}));
 el('add-student').addEventListener('submit', event => {
   event.preventDefault();
   if (el('save-student').disabled) return;
   run(async token => {
     const group = directory.find(item => item.id === activeClass);
-    if (!group) return;
+    if (!group) throw new Error('Crée d’abord une classe.');
     const target = directory.find(item => item.id === el('student-class').value) || group;
     const name = el('first-name').value.trim();
-    if (!name) throw new Error('Saisis un prénom fictif.');
+    if (!name) throw new Error('Saisis un prénom.');
     const previous = group.students.find(student => student.id === editingStudent);
     const { photo: _old, ...kept } = previous || {};
     const student = previous ? { ...kept, name, ...(draftPhoto && { photo: draftPhoto }) } : {

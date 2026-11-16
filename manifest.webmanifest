@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "Trombinoscope de démonstration",
+  "name": "Trombinoscope",
   "short_name": "Trombinoscope",
-  "description": "Trombinoscope scolaire avec des données fictives.",
+  "description": "Trombinoscope scolaire chiffré, stocké uniquement sur l’appareil.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",

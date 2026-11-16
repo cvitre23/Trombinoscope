@@ -1,15 +1,21 @@
-# Procédure de test sur iPad — V3.3
+# Procédure de test sur iPad — V4.0
 
-Uniquement avec des **prénoms et photos fictifs** (photos d'objets, de peluches, etc.).
+À faire **avant** de saisir de vrais élèves, avec des prénoms et photos fictifs (photos d'objets, de peluches). À la fin, effacez toutes les données (écran verrouillé → « Effacer toutes les données ») et créez le trombinoscope définitif.
 
 Préparation : iPad à jour (iPadOS 18 ou plus récent), code de l'iPad activé, Touch ID configuré. Notez pour chaque test : ✅ / ❌ et une remarque.
 
 > Important : l'application ouverte depuis l'écran d'accueil et la page ouverte dans Safari ont **deux stockages séparés**. Faites tous les tests depuis l'icône de l'écran d'accueil.
 
-## 0. Mise à jour depuis la V3.2 (données conservées)
+## 0. Mise à jour depuis la V3.5 (données conservées)
 1. Avec le Wi-Fi, ouvrez le Trombinoscope depuis l'écran d'accueil.
-2. Si l'en-tête affiche encore « V3.2 » : fermez l'app (balayer vers le haut dans le sélecteur d'apps), attendez 1 minute, rouvrez. Répétez au plus 3 fois.
-3. ✅ attendu : « V3.3 » dans l'en-tête, votre ancien mot de passe ouvre l'espace, vos fiches de test sont toujours là.
+2. Si l'en-tête affiche encore « V3.5 » : fermez l'app (balayer vers le haut dans le sélecteur d'apps), attendez 1 minute, rouvrez. Répétez au plus 3 fois.
+3. ✅ attendu : « V4.0 » dans l'en-tête, plus aucun bandeau « données fictives », votre ancien mot de passe ouvre l'espace, vos fiches de test sont toujours là.
+
+## 0 bis. Création du trombinoscope de production
+1. Écran verrouillé → **Effacer toutes les données** → confirmer. ✅ écran « Créer le Trombinoscope ».
+2. Mot de passe de moins de 12 caractères. ✅ refusé.
+3. Deux mots de passe différents. ✅ refusé.
+4. Mot de passe valide saisi deux fois. ✅ trombinoscope vide, « Ajoute une classe pour commencer », aucune classe ni élève d'exemple.
 
 ## 1. Modification des fiches
 1. Touchez **Modifier** sur une fiche, changez le prénom, **Enregistrer**. ✅ nouveau prénom affiché.
@@ -38,12 +44,12 @@ Préparation : iPad à jour (iPadOS 18 ou plus récent), code de l'iPad activé,
 4. Désactivez le mode Avion. ✅ les données ajoutées hors ligne sont là.
 
 ## 5. Réinitialisation annuelle
-Sur un iPad administré, la date est souvent verrouillée : utilisez la **Zone de test**.
-1. Vérifiez la ligne « Prochaine purge annuelle : 1er août 2027 ».
-2. **Simuler le passage au 1er août** → confirmez.
-3. ✅ message « Les données de l'année précédente ont été effacées », écran « Créer un espace de test ».
-4. Fermez et rouvrez l'app. ✅ aucune ancienne classe ni photo.
-5. (Facultatif, si la date est modifiable) Réglages → Général → Date et heure → réglez au 1er août de l'année suivante → rouvrez l'app → ✅ même résultat. Remettez la date automatique.
+La V4.0 n'a plus de bouton de simulation. Testez avec la date de l'iPad, si l'établissement vous laisse la modifier :
+1. Vérifiez la ligne « Effacement automatique de toutes les données le 1er août … » en bas de l'écran.
+2. Réglages → Général → Date et heure → désactivez « Réglage automatique » → réglez la date au 1er août de l'année indiquée.
+3. Rouvrez l'application (fermée complètement). ✅ message « Les données de l'année précédente ont été effacées », écran « Créer le Trombinoscope ».
+4. Remettez le « Réglage automatique » de la date.
+Si la date est verrouillée par l'établissement, ce test a été vérifié automatiquement sur ordinateur ; il n'est pas répétable sur l'iPad.
 
 ## 6. Sécurité du stockage (contrôle depuis Windows, sans Mac)
 L'inspection directe d'IndexedDB sur iPad nécessite un Mac. Le chiffrement a été vérifié automatiquement dans un navigateur de bureau avec le même code. Pour un contrôle vous-même sous Windows :

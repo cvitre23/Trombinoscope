@@ -1,4 +1,4 @@
-# Audit de sécurité — Trombinoscope
+# Audit de sécurité — Trombinoscope (V4.0)
 
 Audit du dépôt `cvitre23/Tonbinoscope-V1.0`, branche `main`, commit `2fa5f47` (« V3.2 stable », 10/11/2026), puis corrections apportées en V3.3.
 
@@ -70,6 +70,19 @@ Le format de l'enregistrement chiffré est **inchangé** : les données de test 
   - iPad partagé (Shared iPad) : non adapté, les données locales sont liées à la session.
 - Si l'activation échoue, l'application l'indique et continue avec le mot de passe.
 
-## 7. Avant toute donnée réelle
+## 7. Changements de la V4.0 (production)
 
-Ne pas saisir de vrais élèves avant : validation des tests de `TESTS-IPAD.md`, accord écrit du chef d'établissement, information du DPO (traitement de données personnelles de mineurs, registre RGPD, information des familles et droit à l'image).
+- Étiquette et bandeau « démonstration / données fictives » retirés ; nom de l'application : « Trombinoscope ».
+- Création d'un trombinoscope **vide** (plus de classes ni d'élèves d'exemple).
+- Mot de passe de **12 caractères minimum**, saisi **deux fois** à la création (une faute de frappe rendrait les données définitivement illisibles). Les trombinoscopes existants s'ouvrent avec leur ancien mot de passe.
+- Zone de test et bouton « Simuler le 1er août » supprimés ; l'information sur le verrouillage et la date de purge reste affichée.
+- Le bouton « Effacer toutes les données » (écran verrouillé) demande une confirmation explicite : il sert si le mot de passe est oublié.
+- Filigrane « CONFIDENTIEL » sur les photos (V3.4 et V3.5).
+- Le format de stockage chiffré est inchangé : une mise à jour depuis la V3.5 conserve les données. L'identifiant interne de la base conserve son ancien nom (`trombinoscope-demo:…`) pour cette raison ; il n'est pas visible.
+
+## 8. Avant de saisir de vrais élèves
+
+1. Accord écrit du chef d'établissement et avis de la personne de référence en protection des données (LPrD, canton de Vaud) : **obtenus** selon le déclarant.
+2. Si l'iPad contient déjà un trombinoscope de test : écran verrouillé → « Effacer toutes les données », puis créer le trombinoscope de production avec un mot de passe de 12 caractères ou plus.
+3. Information des familles et, si l'établissement l'exige, accord pour la photographie.
+4. Restriction de captures d'écran par la gestion des iPad (MDM) : à demander au service informatique si l'établissement le souhaite (non faisable depuis l'application).

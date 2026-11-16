@@ -82,13 +82,3 @@ export async function decryptDirectory(record, key) {
 export function nextPurge(date = new Date()) {
   return new Date(schoolYear(date) + 1, 7, 1);
 }
-
-// Test uniquement : vieillit l’enregistrement d’un an sans le déchiffrer.
-// Au prochain readCurrent, il est supprimé comme lors d’un vrai 1er août.
-export function ageRecord(db, expectedRevision) {
-  return update(db, (store, record) => {
-    if (!record || record.revision !== expectedRevision) return false;
-    store.put({ ...record, year: record.year - 1 }, recordKey);
-    return true;
-  });
-}
