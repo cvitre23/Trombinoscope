@@ -16,7 +16,7 @@
 <body>
   <header class="hero">
     <div class="wrap">
-      <p class="eyebrow">TROMBINOSCOPE SCOLAIRE · V4.2</p>
+      <p class="eyebrow">TROMBINOSCOPE SCOLAIRE · V4.3</p>
       <h1>Trombinoscope</h1>
       <p>Les classes et leurs portraits, sur cet appareil.</p>
     </div>
@@ -100,6 +100,7 @@
             <fieldset class="photo-field">
               <legend>Photo (facultative)</legend>
               <img id="photo-preview" alt="Aperçu de la photo" hidden>
+              <label class="check"><input id="oval-crop" type="checkbox" checked> Recadrer automatiquement en ovale, photo centrée</label>
               <div class="actions" aria-describedby="photo-help">
                 <button id="take-photo" class="secondary" type="button">Prendre une photo</button>
                 <button id="import-photo" class="secondary" type="button">Importer une photo</button>
@@ -128,6 +129,12 @@
         </details>
       </div>
     </section>
+    <div id="zoom" class="zoom" hidden role="dialog" aria-modal="true" aria-label="Photo agrandie">
+      <figure>
+        <img id="zoom-img" alt="">
+        <figcaption id="zoom-name"></figcaption>
+      </figure>
+    </div>
     <noscript>Active JavaScript dans le navigateur pour ouvrir le Trombinoscope.</noscript>
   </main>
 </body>

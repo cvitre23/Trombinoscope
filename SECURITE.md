@@ -1,4 +1,4 @@
-# Audit de sécurité — Trombinoscope (V4.2)
+# Audit de sécurité — Trombinoscope (V4.3)
 
 Audit du dépôt `cvitre23/Tonbinoscope-V1.0`, branche `main`, commit `2fa5f47` (« V3.2 stable », 10/11/2026), puis corrections apportées en V3.3.
 
@@ -89,3 +89,6 @@ Le format de l'enregistrement chiffré est **inchangé** : les données de test 
 
 ## 9. Changements de la V4.2 (interface)
 Écran d'accueil avec une icône par classe ; un appui ouvre le trombinoscope de la classe (bouton « Classes » pour revenir). Ajout de classes, gestion des fiches et sécurité repliés. Aucun changement de chiffrement, de stockage ni de réseau.
+
+## 10. Changements de la V4.3
+Photos recadrées automatiquement en ovale 3:4 (option décochable pour un cadrage carré) ; appui sur une photo = zoom de 3 secondes (fermeture au toucher, par Échap ou au verrouillage). Traitement local uniquement : aucun changement de chiffrement, de stockage ni de réseau. Pas de détection de visage (non disponible sur Safari) : le cadrage est centré.

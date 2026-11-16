@@ -50,6 +50,7 @@ function lock() {
   pickerOpenedAt = 0;
   passkeyRequest?.abort();
   clearPasskeySetup();
+  closeZoom();
   directory = key = activeClass = undefined;
   for (const id of ['unlock', 'add-class']) el(id).reset();
   resetStudentForm();
@@ -67,6 +68,23 @@ function showPhoto(photo) {
   else preview.removeAttribute('src');
   preview.hidden = !photo;
   el('remove-photo').hidden = !photo;
+}
+
+let zoomTimer;
+function closeZoom() {
+  clearTimeout(zoomTimer);
+  el('zoom').hidden = true;
+  el('zoom-img').removeAttribute('src');
+  el('zoom-name').textContent = '';
+}
+
+function openZoom(student) {
+  if (!student.photo) return;
+  clearTimeout(zoomTimer);
+  el('zoom-img').src = student.photo;
+  el('zoom-name').textContent = student.name;
+  el('zoom').hidden = false;
+  zoomTimer = setTimeout(closeZoom, 3000);
 }
 
 function selectClass(id) {
@@ -156,6 +174,16 @@ function showDirectory() {
     if (student.photo) {
       portrait.src = student.photo;
       portrait.alt = '';
+      portrait.tabIndex = 0;
+      portrait.setAttribute('role', 'button');
+      portrait.setAttribute('aria-label', 'Agrandir la photo de ' + student.name);
+      portrait.addEventListener('click', () => openZoom(student));
+      portrait.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openZoom(student);
+        }
+      });
     } else {
       portrait.className = 'avatar';
       portrait.setAttribute('aria-hidden', 'true');
@@ -422,7 +450,7 @@ el('unlock-passkey').addEventListener('click', () => run(async token => {
   el('directory-title').focus();
 }));
 
-async function resizeImage(file) {
+async function resizeImage(file, oval) {
   const supported = /^image\/(jpeg|png|webp|heic|heif)$/i.test(file.type) ||
     (!file.type && /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name));
   if (!supported || file.size > 25 * 1024 * 1024) {
@@ -433,13 +461,23 @@ async function resizeImage(file) {
     const image = new Image();
     image.src = source;
     await image.decode();
-    const size = Math.min(400, image.naturalWidth, image.naturalHeight);
-    const side = Math.min(image.naturalWidth, image.naturalHeight);
+    const w = image.naturalWidth;
+    const h = image.naturalHeight;
+    // Ovale : cadrage portrait 3:4, centré à l'horizontale ; si la photo est
+    // plus haute que large, le cadre est placé un peu au-dessus du milieu
+    // (les visages sont rarement au centre exact). Sinon : carré centré.
+    const ratio = oval ? 0.75 : 1;
+    const cw = Math.min(w, h * ratio);
+    const ch = cw / ratio;
+    const sx = (w - cw) / 2;
+    const sy = Math.max(0, Math.min(h - ch, (h - ch) * (oval ? 0.35 : 0.5)));
+    const outH = Math.min(400, Math.round(ch));
+    const outW = Math.round(outH * ratio);
     const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = size;
+    canvas.width = outW;
+    canvas.height = outH;
     const context = canvas.getContext('2d', { alpha: false });
-    context.drawImage(image, (image.naturalWidth - side) / 2,
-      (image.naturalHeight - side) / 2, side, side, 0, 0, size, size);
+    context.drawImage(image, sx, sy, cw, ch, 0, 0, outW, outH);
     return canvas.toDataURL('image/jpeg', 0.82);
   } catch {
     throw new Error('Ce navigateur ne peut pas lire cette image. Essaie avec une photo JPEG.');
@@ -458,7 +496,7 @@ async function selectPhoto(input) {
   el('save-student').disabled = true;
   status.textContent = 'Préparation de la photo…';
   try {
-    const photo = await resizeImage(file);
+    const photo = await resizeImage(file, el('oval-crop').checked);
     if (selection !== photoSelection) return;
     draftPhoto = photo;
     showPhoto(photo);
@@ -548,7 +586,12 @@ for (const type of ['pointerdown', 'keydown', 'scroll']) {
 window.addEventListener('pagehide', lock);
 window.addEventListener('pageshow', event => { if (event.persisted) checkYearOnReturn(); });
 
+el('zoom').addEventListener('click', closeZoom);
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !el('zoom').hidden) closeZoom();
+});
 el('back').addEventListener('click', () => {
+  closeZoom();
   if (busy) return;
   resetStudentForm();
   el('manage').open = el('class-options').open = false;
