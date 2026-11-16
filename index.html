@@ -16,7 +16,7 @@
 <body>
   <header class="hero">
     <div class="wrap">
-      <p class="eyebrow">TROMBINOSCOPE SCOLAIRE · V4.3</p>
+      <p class="eyebrow">TROMBINOSCOPE SCOLAIRE · V4.4</p>
       <h1>Trombinoscope</h1>
       <p>Les classes et leurs portraits, sur cet appareil.</p>
     </div>
@@ -100,7 +100,6 @@
             <fieldset class="photo-field">
               <legend>Photo (facultative)</legend>
               <img id="photo-preview" alt="Aperçu de la photo" hidden>
-              <label class="check"><input id="oval-crop" type="checkbox" checked> Recadrer automatiquement en ovale, photo centrée</label>
               <div class="actions" aria-describedby="photo-help">
                 <button id="take-photo" class="secondary" type="button">Prendre une photo</button>
                 <button id="import-photo" class="secondary" type="button">Importer une photo</button>
@@ -129,6 +128,20 @@
         </details>
       </div>
     </section>
+    <div id="cropper" class="cropper" hidden role="dialog" aria-modal="true" aria-labelledby="crop-title">
+      <div class="crop-box">
+        <h3 id="crop-title">Place le visage dans l’ovale</h3>
+        <canvas id="crop-canvas" width="360" height="480" tabindex="0" aria-label="Photo à recadrer : glisse pour déplacer, pince ou utilise le curseur pour zoomer"></canvas>
+        <label for="crop-zoom" class="sr-only">Zoom</label>
+        <input id="crop-zoom" type="range" min="1" max="4" step="0.01" value="1">
+        <p class="small">Glisse la photo pour la déplacer. Zoom : pince avec deux doigts ou curseur.</p>
+        <div class="actions">
+          <button id="crop-ok" type="button">Valider</button>
+          <button id="crop-reset" class="secondary" type="button">Recentrer</button>
+          <button id="crop-cancel" class="plain" type="button">Annuler</button>
+        </div>
+      </div>
+    </div>
     <div id="zoom" class="zoom" hidden role="dialog" aria-modal="true" aria-label="Photo agrandie">
       <figure>
         <img id="zoom-img" alt="">

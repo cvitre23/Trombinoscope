@@ -31,6 +31,12 @@ label { font-weight: 650; }
 .photo-field { border: 0; padding: 0; margin: .25rem 0; min-width: 0; }
 .photo-field legend { font-weight: 650; padding: 0; }
 #photo-preview { display: block; width: 96px; height: auto; object-fit: cover; border-radius: 50%; margin-block: .4rem; }
+#crop-canvas { touch-action: none; }
+.cropper { position: fixed; inset: 0; z-index: 20; overflow: auto; display: grid; place-items: center; background: rgba(10, 30, 26, .92); padding: 1rem; }
+.crop-box { background: #fff; border-radius: 1rem; padding: 1rem; width: min(100%, 26rem); text-align: center; }
+.crop-box canvas { display: block; margin: .5rem auto; width: min(100%, 18rem); height: auto; aspect-ratio: 3 / 4; border-radius: .6rem; border: 1px solid #cad8cf; cursor: grab; }
+.crop-box input[type=range] { padding: 0; min-height: 44px; }
+.crop-box .actions { justify-content: center; }
 .check { display: flex; align-items: center; gap: .5rem; font-weight: 500; margin-block: .3rem; }
 .check input { width: 1.4rem; height: 1.4rem; min-height: 0; flex: none; }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }

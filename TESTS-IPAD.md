@@ -1,4 +1,4 @@
-# Procédure de test sur iPad — V4.3
+# Procédure de test sur iPad — V4.4
 
 À faire **avant** de saisir de vrais élèves, avec des prénoms et photos fictifs (photos d'objets, de peluches). À la fin, effacez toutes les données (écran verrouillé → « Effacer toutes les données ») et créez le trombinoscope définitif.
 
@@ -9,7 +9,7 @@ Préparation : iPad à jour (iPadOS 18 ou plus récent), code de l'iPad activé,
 ## 0. Mise à jour depuis la V3.5 (données conservées)
 1. Avec le Wi-Fi, ouvrez le Trombinoscope depuis l'écran d'accueil.
 2. Si l'en-tête affiche encore « V3.5 » : fermez l'app (balayer vers le haut dans le sélecteur d'apps), attendez 1 minute, rouvrez. Répétez au plus 3 fois.
-3. ✅ attendu : « V4.3 » dans l'en-tête, plus aucun bandeau « données fictives », votre ancien mot de passe ouvre l'espace, vos fiches de test sont toujours là.
+3. ✅ attendu : « V4.4 » dans l'en-tête, plus aucun bandeau « données fictives », votre ancien mot de passe ouvre l'espace, vos fiches de test sont toujours là.
 
 ## 0 bis. Création du trombinoscope de production
 1. Écran verrouillé → **Effacer toutes les données** → confirmer. ✅ écran « Créer le Trombinoscope ».
