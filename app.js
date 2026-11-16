@@ -53,8 +53,10 @@ function lock() {
   directory = key = activeClass = undefined;
   for (const id of ['unlock', 'add-class']) el(id).reset();
   resetStudentForm();
-  for (const id of ['students', 'classes']) el(id).replaceChildren();
-  for (const id of ['class-title', 'empty']) el(id).textContent = '';
+  for (const id of ['students', 'class-tiles']) el(id).replaceChildren();
+  for (const id of ['manage', 'class-options', 'security', 'add-class-fold']) el(id).open = false;
+  el('empty').textContent = '';
+  el('directory-title').textContent = 'Mes classes';
   if (db) showLock();
   say('');
 }
@@ -64,8 +66,36 @@ function showPhoto(photo) {
   if (photo) preview.src = photo;
   else preview.removeAttribute('src');
   preview.hidden = !photo;
-  el('photo-frame').hidden = !photo;
   el('remove-photo').hidden = !photo;
+}
+
+function selectClass(id) {
+  if (busy) return;
+  resetStudentForm();
+  el('manage').open = el('class-options').open = false;
+  say('');
+  activeClass = id;
+  showDirectory();
+  el('directory-title').focus();
+}
+
+function renderTiles() {
+  el('class-tiles').replaceChildren(...directory.map(group => {
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'tile';
+    const name = document.createElement('span');
+    name.className = 'tile-name';
+    name.textContent = group.name;
+    const count = document.createElement('span');
+    count.className = 'tile-count';
+    count.textContent = group.students.length + (group.students.length > 1 ? ' élèves' : ' élève');
+    button.append(el('tile-icon').content.cloneNode(true), name, count);
+    button.addEventListener('click', () => selectClass(group.id));
+    item.append(button);
+    return item;
+  }));
 }
 
 function fillClassSelect(select, selected) {
@@ -103,37 +133,29 @@ function showDirectory() {
   el('unlocked').hidden = false;
   el('passkey-panel').hidden = !supportsPasskeys;
   el('prepare-passkey').textContent = record.passkey ? 'Désactiver la clé d’accès' : 'Continuer';
-  const current = directory.find(group => group.id === activeClass) || directory[0];
+  const current = directory.find(group => group.id === activeClass);
   activeClass = current?.id;
-  el('classes').replaceChildren(...directory.map(group => new Option(group.name, group.id)));
-  if (current) el('classes').value = current.id;
-  el('classes').disabled = !current;
-  el('remove-class').hidden = !current;
-  el('rename-class').hidden = !current;
+  el('home').hidden = !!current;
+  el('class-view').hidden = !current;
+  el('back').hidden = !current;
+  el('directory-title').textContent = current?.name || 'Mes classes';
+  renderTiles();
+  el('empty-home').hidden = directory.length > 0;
+  if (!directory.length) el('add-class-fold').open = true;
   el('rename-class-name').value = current?.name || '';
   if (!editingStudent) fillClassSelect(el('student-class'), current?.id);
   el('idle-minutes').textContent = idleMinutes;
   el('purge-date').textContent = '1er août ' + nextPurge().getFullYear();
   armIdleLock();
-  el('student-panel').hidden = !current;
-  el('class-title').textContent = current?.name || '';
-  el('empty').textContent = !current ? 'Ajoute une classe pour commencer.'
+  el('empty').textContent = !current ? ''
     : current.students.length ? '' : 'Cette classe ne contient aucune fiche.';
   el('students').replaceChildren(...(current?.students || []).map(student => {
     const card = document.createElement('li');
     card.className = 'card';
-    const portrait = document.createElement('span');
+    const portrait = document.createElement(student.photo ? 'img' : 'span');
     if (student.photo) {
-      // Filigrane affiché par-dessus la photo : toute capture d’écran le contient.
-      portrait.className = 'portrait round';
-      const image = document.createElement('img');
-      image.src = student.photo;
-      image.alt = '';
-      const mark = document.createElement('span');
-      mark.className = 'watermark';
-      mark.setAttribute('aria-hidden', 'true');
-      mark.textContent = 'CONFIDENTIEL';
-      portrait.append(image, mark);
+      portrait.src = student.photo;
+      portrait.alt = '';
     } else {
       portrait.className = 'avatar';
       portrait.setAttribute('aria-hidden', 'true');
@@ -149,6 +171,8 @@ function showDirectory() {
     edit.addEventListener('click', () => {
       if (busy) return;
       resetStudentForm(student);
+      el('manage').open = true;
+      el('student-panel').scrollIntoView({ block: 'center' });
       el('first-name').focus();
     });
     const remove = document.createElement('button');
@@ -524,15 +548,14 @@ for (const type of ['pointerdown', 'keydown', 'scroll']) {
 window.addEventListener('pagehide', lock);
 window.addEventListener('pageshow', event => { if (event.persisted) checkYearOnReturn(); });
 
-el('classes').addEventListener('change', event => {
-  if (busy) {
-    event.target.value = activeClass;
-    return;
-  }
+el('back').addEventListener('click', () => {
+  if (busy) return;
   resetStudentForm();
-  activeClass = event.target.value;
+  el('manage').open = el('class-options').open = false;
+  say('');
+  activeClass = undefined;
   showDirectory();
-  el('classes').focus();
+  el('directory-title').focus();
 });
 el('add-class').addEventListener('submit', event => {
   event.preventDefault();
@@ -540,7 +563,7 @@ el('add-class').addEventListener('submit', event => {
     const name = el('class-name').value.trim();
     if (!name) throw new Error('Saisis un nom de classe.');
     const group = { id: crypto.randomUUID(), name, students: [] };
-    if (await save([...directory, group], token, group.id, 'Classe ajoutée.')) event.target.reset();
+    if (await save([...directory, group], token, undefined, 'Classe ajoutée.')) event.target.reset();
   });
 });
 el('remove-class').addEventListener('click', () => run(async token => {

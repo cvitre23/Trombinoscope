@@ -1,4 +1,4 @@
-# Audit de sécurité — Trombinoscope (V4.0)
+# Audit de sécurité — Trombinoscope (V4.2)
 
 Audit du dépôt `cvitre23/Tonbinoscope-V1.0`, branche `main`, commit `2fa5f47` (« V3.2 stable », 10/11/2026), puis corrections apportées en V3.3.
 
@@ -77,7 +77,7 @@ Le format de l'enregistrement chiffré est **inchangé** : les données de test 
 - Mot de passe de **12 caractères minimum**, saisi **deux fois** à la création (une faute de frappe rendrait les données définitivement illisibles). Les trombinoscopes existants s'ouvrent avec leur ancien mot de passe.
 - Zone de test et bouton « Simuler le 1er août » supprimés ; l'information sur le verrouillage et la date de purge reste affichée.
 - Le bouton « Effacer toutes les données » (écran verrouillé) demande une confirmation explicite : il sert si le mot de passe est oublié.
-- Filigrane « CONFIDENTIEL » sur les photos (V3.4 et V3.5).
+- Pas de filigrane sur les photos (essayé en V3.4 et V3.5, retiré à la demande de l'utilisateur). Une application web ne peut ni détecter ni bloquer une capture d'écran ; seule la restriction MDM le permet.
 - Le format de stockage chiffré est inchangé : une mise à jour depuis la V3.5 conserve les données. L'identifiant interne de la base conserve son ancien nom (`trombinoscope-demo:…`) pour cette raison ; il n'est pas visible.
 
 ## 8. Avant de saisir de vrais élèves
@@ -86,3 +86,6 @@ Le format de l'enregistrement chiffré est **inchangé** : les données de test 
 2. Si l'iPad contient déjà un trombinoscope de test : écran verrouillé → « Effacer toutes les données », puis créer le trombinoscope de production avec un mot de passe de 12 caractères ou plus.
 3. Information des familles et, si l'établissement l'exige, accord pour la photographie.
 4. Restriction de captures d'écran par la gestion des iPad (MDM) : à demander au service informatique si l'établissement le souhaite (non faisable depuis l'application).
+
+## 9. Changements de la V4.2 (interface)
+Écran d'accueil avec une icône par classe ; un appui ouvre le trombinoscope de la classe (bouton « Classes » pour revenir). Ajout de classes, gestion des fiches et sécurité repliés. Aucun changement de chiffrement, de stockage ni de réseau.

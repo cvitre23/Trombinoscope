@@ -52,16 +52,19 @@ form button, #reset { justify-self: start; margin-top: .2rem; }
 .card img { display: block; margin: 0 auto .45rem; width: 80px; height: 80px; object-fit: cover; border-radius: 50%; background: #e4f2e9; }
 .avatar { display: grid; place-items: center; margin: 0 auto .45rem; width: 80px; height: 80px; border-radius: 50%; background: #d8ece0; font-size: 2.35rem; }
 #rename-class { margin-top: .9rem; }
-.card img, .avatar { width: 120px; height: 120px; }
-.portrait { position: relative; display: block; width: 120px; height: 120px; overflow: hidden; border-radius: .6rem; margin-block: .4rem; }
-.portrait.round { border-radius: 50%; margin: 0 auto .45rem; }
-.portrait img, .card .portrait img { display: block; width: 100%; height: 100%; margin: 0; border-radius: 0; object-fit: cover; }
-.watermark {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) rotate(-28deg);
-  width: 170%; padding: .4rem 0; text-align: center; white-space: nowrap;
-  font-size: .8rem; font-weight: 900; letter-spacing: 0; color: #fff;
-  background: rgba(190, 15, 15, .82); border-block: 2px solid rgba(255, 255, 255, .85);
-  text-shadow: 0 1px 2px #000, 0 0 3px #000;
-  pointer-events: none; user-select: none; -webkit-user-select: none;
-}
-#photo-frame #photo-preview { width: 100%; height: 100%; margin: 0; border-radius: 0; }
+.card img, .avatar { width: 96px; height: 96px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+#directory-title { flex: 1 1 auto; font-size: 1.5rem; }
+.section-head { gap: .75rem; flex-wrap: nowrap; }
+.tiles { list-style: none; margin: .5rem 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: 1rem; }
+.tile { width: 100%; min-height: 9.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3rem; padding: 1rem .75rem; background: #fff; color: #164d40; border: 2px solid #cad8cf; border-radius: 1.2rem; }
+.tile:active { background: #e4f2e9; }
+.tile-icon { color: #215e4e; }
+.tile-name { font-size: 1.25rem; font-weight: 700; overflow-wrap: anywhere; }
+.tile-count { font-weight: 500; font-size: .92rem; color: #40594e; }
+.fold { margin-block: 1rem; }
+.fold summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+.fold[open] summary { margin-bottom: .5rem; }
+.fold .columns { margin-bottom: 0; }
+.fold .columns > section { border: 1px solid #cad8cf; border-radius: 1rem; padding: 1rem; }
+.fold #passkey-panel { margin-block: 0 1rem; }

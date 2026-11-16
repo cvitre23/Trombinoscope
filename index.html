@@ -16,7 +16,7 @@
 <body>
   <header class="hero">
     <div class="wrap">
-      <p class="eyebrow">TROMBINOSCOPE SCOLAIRE · V4.0</p>
+      <p class="eyebrow">TROMBINOSCOPE SCOLAIRE · V4.2</p>
       <h1>Trombinoscope</h1>
       <p>Les classes et leurs portraits, sur cet appareil.</p>
     </div>
@@ -42,28 +42,55 @@
     </section>
     <section id="unlocked" hidden aria-labelledby="directory-title">
       <div class="section-head">
+        <button id="back" class="secondary" type="button" hidden>
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+          Classes
+        </button>
         <h2 id="directory-title" tabindex="-1">Mes classes</h2>
         <button id="lock" class="secondary" type="button">Verrouiller</button>
       </div>
-      <div class="columns">
-        <section class="panel">
-          <label for="classes">Classe affichée</label>
-          <div class="row">
-            <select id="classes"></select>
-            <button id="remove-class" class="plain" type="button">Supprimer la classe</button>
-          </div>
-          <form id="rename-class">
-            <label for="rename-class-name">Renommer la classe affichée</label>
-            <input id="rename-class-name" maxlength="50" required autocomplete="off">
-            <button>Renommer</button>
-          </form>
+
+      <div id="home">
+        <p id="empty-home">Ajoute une classe pour commencer.</p>
+        <ul id="class-tiles" class="tiles" aria-label="Classes"></ul>
+        <template id="tile-icon"><svg class="tile-icon" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M2.8 20c.4-3.6 3-5.6 6.2-5.6s5.8 2 6.2 5.6"/><circle cx="17.2" cy="9" r="2.4"/><path d="M17.5 14.4c2.3.2 3.9 1.8 4.2 4.6"/></svg></template>
+        <details id="add-class-fold" class="panel fold">
+          <summary>Ajouter une classe</summary>
           <form id="add-class">
             <label for="class-name">Nom de la nouvelle classe</label>
             <input id="class-name" maxlength="50" required>
             <button>Ajouter la classe</button>
           </form>
-        </section>
-        <section id="student-panel" class="panel" aria-labelledby="student-form-title">
+        </details>
+        <details id="security" class="panel fold">
+        <summary>Sécurité et clé d’accès</summary>
+        <section id="passkey-panel" aria-labelledby="passkey-title" hidden>
+        <h3 id="passkey-title">Clé d’accès</h3>
+        <p class="small">Ton appareil choisit la vérification, par exemple Touch ID ou son code. Garde le mot de passe du Trombinoscope pour le déverrouillage de secours.</p>
+        <form id="passkey-setup">
+          <label for="passkey-password">Confirme le mot de passe du Trombinoscope</label>
+          <input id="passkey-password" type="password" required maxlength="128" autocomplete="current-password">
+          <button id="prepare-passkey">Continuer</button>
+        </form>
+        <div class="actions">
+          <button id="confirm-passkey" type="button" hidden>Créer une clé d’accès</button>
+          <button id="cancel-passkey" class="secondary" type="button" hidden>Annuler</button>
+        </div>
+        <p id="passkey-status" class="small" role="status"></p>
+      </section>
+        <section aria-labelledby="info-title">
+        <h3 id="info-title">Sécurité</h3>
+        <p class="small">Verrouillage automatique après <span id="idle-minutes"></span> minutes sans action. Effacement automatique de toutes les données le <strong id="purge-date"></strong>, à la première ouverture après cette date.</p>
+      </section>
+      </details>
+      </div>
+
+      <div id="class-view" hidden>
+        <p id="empty"></p>
+        <ul id="students" class="students" aria-labelledby="directory-title"></ul>
+        <details id="manage" class="panel fold">
+          <summary>Ajouter ou modifier des fiches</summary>
+          <section id="student-panel" aria-labelledby="student-form-title">
           <h3 id="student-form-title">Ajouter une fiche</h3>
           <form id="add-student">
             <label for="first-name">Prénom</label>
@@ -72,7 +99,7 @@
             <select id="student-class"></select>
             <fieldset class="photo-field">
               <legend>Photo (facultative)</legend>
-              <span id="photo-frame" class="portrait" hidden><img id="photo-preview" alt="Aperçu de la photo" hidden><span class="watermark" aria-hidden="true">CONFIDENTIEL</span></span>
+              <img id="photo-preview" alt="Aperçu de la photo" hidden>
               <div class="actions" aria-describedby="photo-help">
                 <button id="take-photo" class="secondary" type="button">Prendre une photo</button>
                 <button id="import-photo" class="secondary" type="button">Importer une photo</button>
@@ -89,28 +116,17 @@
             </div>
           </form>
         </section>
+        </details>
+        <details id="class-options" class="panel fold">
+          <summary>Options de la classe</summary>
+          <form id="rename-class">
+            <label for="rename-class-name">Renommer la classe</label>
+            <input id="rename-class-name" maxlength="50" required autocomplete="off">
+            <button>Renommer</button>
+          </form>
+          <button id="remove-class" class="plain" type="button">Supprimer la classe</button>
+        </details>
       </div>
-      <h3 id="class-title"></h3>
-      <p id="empty"></p>
-      <ul id="students" class="students" aria-labelledby="class-title"></ul>
-      <section id="passkey-panel" class="panel" aria-labelledby="passkey-title" hidden>
-        <h3 id="passkey-title">Clé d’accès</h3>
-        <p class="small">Ton appareil choisit la vérification, par exemple Touch ID ou son code. Garde le mot de passe du Trombinoscope pour le déverrouillage de secours.</p>
-        <form id="passkey-setup">
-          <label for="passkey-password">Confirme le mot de passe du Trombinoscope</label>
-          <input id="passkey-password" type="password" required maxlength="128" autocomplete="current-password">
-          <button id="prepare-passkey">Continuer</button>
-        </form>
-        <div class="actions">
-          <button id="confirm-passkey" type="button" hidden>Créer une clé d’accès</button>
-          <button id="cancel-passkey" class="secondary" type="button" hidden>Annuler</button>
-        </div>
-        <p id="passkey-status" class="small" role="status"></p>
-      </section>
-      <section class="panel" aria-labelledby="info-title">
-        <h3 id="info-title">Sécurité</h3>
-        <p class="small">Verrouillage automatique après <span id="idle-minutes"></span> minutes sans action. Effacement automatique de toutes les données le <strong id="purge-date"></strong>, à la première ouverture après cette date.</p>
-      </section>
     </section>
     <noscript>Active JavaScript dans le navigateur pour ouvrir le Trombinoscope.</noscript>
   </main>
