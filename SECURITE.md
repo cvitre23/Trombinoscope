@@ -77,7 +77,7 @@ Le format de l'enregistrement chiffré est **inchangé** : les données de test 
 - Mot de passe de **12 caractères minimum**, saisi **deux fois** à la création (une faute de frappe rendrait les données définitivement illisibles). Les trombinoscopes existants s'ouvrent avec leur ancien mot de passe.
 - Zone de test et bouton « Simuler le 1er août » supprimés ; l'information sur le verrouillage et la date de purge reste affichée.
 - Le bouton « Effacer toutes les données » (écran verrouillé) demande une confirmation explicite : il sert si le mot de passe est oublié.
-- Filigrane « CONFIDENTIEL » sur les photos (V3.4 et V3.5).
+- Pas de filigrane sur les photos (essayé en V3.4 et V3.5, retiré à la demande de l'utilisateur). Une application web ne peut ni détecter ni bloquer une capture d'écran ; seule la restriction MDM le permet.
 - Le format de stockage chiffré est inchangé : une mise à jour depuis la V3.5 conserve les données. L'identifiant interne de la base conserve son ancien nom (`trombinoscope-demo:…`) pour cette raison ; il n'est pas visible.
 
 ## 8. Avant de saisir de vrais élèves
