@@ -30,7 +30,15 @@ form { display: grid; gap: .4rem; margin-top: .65rem; }
 label { font-weight: 650; }
 .photo-field { border: 0; padding: 0; margin: .25rem 0; min-width: 0; }
 .photo-field legend { font-weight: 650; padding: 0; }
-#photo-preview { display: block; width: 96px; height: 96px; object-fit: cover; border-radius: .6rem; margin-block: .4rem; }
+#photo-preview { display: block; width: 96px; height: auto; object-fit: cover; border-radius: 50%; margin-block: .4rem; }
+#crop-canvas { touch-action: none; }
+.cropper { position: fixed; inset: 0; z-index: 20; overflow: auto; display: grid; place-items: center; background: rgba(10, 30, 26, .92); padding: 1rem; }
+.crop-box { background: #fff; border-radius: 1rem; padding: 1rem; width: min(100%, 26rem); text-align: center; }
+.crop-box canvas { display: block; margin: .5rem auto; width: min(100%, 18rem); height: auto; aspect-ratio: 3 / 4; border-radius: .6rem; border: 1px solid #cad8cf; cursor: grab; }
+.crop-box input[type=range] { padding: 0; min-height: 44px; }
+.crop-box .actions { justify-content: center; }
+.check { display: flex; align-items: center; gap: .5rem; font-weight: 500; margin-block: .3rem; }
+.check input { width: 1.4rem; height: 1.4rem; min-height: 0; flex: none; }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem; }
 button, input, select {
   font: inherit;
@@ -52,7 +60,12 @@ form button, #reset { justify-self: start; margin-top: .2rem; }
 .card img { display: block; margin: 0 auto .45rem; width: 80px; height: 80px; object-fit: cover; border-radius: 50%; background: #e4f2e9; }
 .avatar { display: grid; place-items: center; margin: 0 auto .45rem; width: 80px; height: 80px; border-radius: 50%; background: #d8ece0; font-size: 2.35rem; }
 #rename-class { margin-top: .9rem; }
-.card img, .avatar { width: 96px; height: 96px; }
+.card img { width: 96px; height: auto; cursor: zoom-in; }
+.avatar { width: 96px; height: 128px; border-radius: 50%; }
+.zoom { position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; background: rgba(10, 30, 26, .85); }
+.zoom figure { margin: 0; text-align: center; color: #fff; }
+.zoom img { display: block; margin: 0 auto .75rem; max-width: min(80vw, 28rem); max-height: 72vh; width: auto; height: auto; border-radius: 50%; border: 4px solid #fff; background: #e4f2e9; }
+.zoom figcaption { font-size: 1.6rem; font-weight: 700; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 #directory-title { flex: 1 1 auto; font-size: 1.5rem; }
 .section-head { gap: .75rem; flex-wrap: nowrap; }

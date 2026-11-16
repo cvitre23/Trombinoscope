@@ -50,6 +50,8 @@ function lock() {
   pickerOpenedAt = 0;
   passkeyRequest?.abort();
   clearPasskeySetup();
+  closeZoom();
+  if (cropState) closeCropper(null);
   directory = key = activeClass = undefined;
   for (const id of ['unlock', 'add-class']) el(id).reset();
   resetStudentForm();
@@ -67,6 +69,23 @@ function showPhoto(photo) {
   else preview.removeAttribute('src');
   preview.hidden = !photo;
   el('remove-photo').hidden = !photo;
+}
+
+let zoomTimer;
+function closeZoom() {
+  clearTimeout(zoomTimer);
+  el('zoom').hidden = true;
+  el('zoom-img').removeAttribute('src');
+  el('zoom-name').textContent = '';
+}
+
+function openZoom(student) {
+  if (!student.photo) return;
+  clearTimeout(zoomTimer);
+  el('zoom-img').src = student.photo;
+  el('zoom-name').textContent = student.name;
+  el('zoom').hidden = false;
+  zoomTimer = setTimeout(closeZoom, 3000);
 }
 
 function selectClass(id) {
@@ -156,6 +175,16 @@ function showDirectory() {
     if (student.photo) {
       portrait.src = student.photo;
       portrait.alt = '';
+      portrait.tabIndex = 0;
+      portrait.setAttribute('role', 'button');
+      portrait.setAttribute('aria-label', 'Agrandir la photo de ' + student.name);
+      portrait.addEventListener('click', () => openZoom(student));
+      portrait.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openZoom(student);
+        }
+      });
     } else {
       portrait.className = 'avatar';
       portrait.setAttribute('aria-hidden', 'true');
@@ -422,7 +451,7 @@ el('unlock-passkey').addEventListener('click', () => run(async token => {
   el('directory-title').focus();
 }));
 
-async function resizeImage(file) {
+async function loadImage(file) {
   const supported = /^image\/(jpeg|png|webp|heic|heif)$/i.test(file.type) ||
     (!file.type && /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name));
   if (!supported || file.size > 25 * 1024 * 1024) {
@@ -433,20 +462,176 @@ async function resizeImage(file) {
     const image = new Image();
     image.src = source;
     await image.decode();
-    const size = Math.min(400, image.naturalWidth, image.naturalHeight);
-    const side = Math.min(image.naturalWidth, image.naturalHeight);
-    const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = size;
-    const context = canvas.getContext('2d', { alpha: false });
-    context.drawImage(image, (image.naturalWidth - side) / 2,
-      (image.naturalHeight - side) / 2, side, side, 0, 0, size, size);
-    return canvas.toDataURL('image/jpeg', 0.82);
+    return image;
   } catch {
     throw new Error('Ce navigateur ne peut pas lire cette image. Essaie avec une photo JPEG.');
   } finally {
     URL.revokeObjectURL(source);
   }
 }
+
+// Recadrage manuel : on déplace et on zoome la photo derrière un ovale.
+// Tout se passe dans un canvas local ; rien ne quitte l'appareil.
+const cropW = 360;
+const cropH = 480;
+let cropState;
+
+function closeCropper(result) {
+  const state = cropState;
+  cropState = undefined;
+  el('cropper').hidden = true;
+  const canvas = el('crop-canvas');
+  canvas.getContext('2d').clearRect(0, 0, cropW, cropH);
+  state?.finish(result);
+}
+
+function drawCrop(guide) {
+  const { image, scale, x, y } = cropState;
+  const canvas = el('crop-canvas');
+  const context = canvas.getContext('2d');
+  context.fillStyle = '#fff';
+  context.fillRect(0, 0, cropW, cropH);
+  context.drawImage(image, x, y, image.naturalWidth * scale, image.naturalHeight * scale);
+  if (!guide) return;
+  context.save();
+  context.fillStyle = 'rgba(10, 30, 26, .62)';
+  context.beginPath();
+  context.rect(0, 0, cropW, cropH);
+  context.ellipse(cropW / 2, cropH / 2, cropW / 2 - 3, cropH / 2 - 3, 0, 0, Math.PI * 2);
+  context.fill('evenodd');
+  context.strokeStyle = '#fff';
+  context.lineWidth = 3;
+  context.setLineDash([10, 7]);
+  context.beginPath();
+  context.ellipse(cropW / 2, cropH / 2, cropW / 2 - 3, cropH / 2 - 3, 0, 0, Math.PI * 2);
+  context.stroke();
+  context.restore();
+}
+
+function clampCrop() {
+  const s = cropState;
+  s.zoom = Math.min(4, Math.max(1, s.zoom));
+  s.scale = s.min * s.zoom;
+  const w = s.image.naturalWidth * s.scale;
+  const h = s.image.naturalHeight * s.scale;
+  s.x = Math.min(0, Math.max(cropW - w, s.x));
+  s.y = Math.min(0, Math.max(cropH - h, s.y));
+  el('crop-zoom').value = String(s.zoom);
+}
+
+function zoomCrop(next, anchorX = cropW / 2, anchorY = cropH / 2) {
+  const s = cropState;
+  const ix = (anchorX - s.x) / s.scale;
+  const iy = (anchorY - s.y) / s.scale;
+  s.zoom = next;
+  s.scale = s.min * Math.min(4, Math.max(1, next));
+  s.x = anchorX - ix * s.scale;
+  s.y = anchorY - iy * s.scale;
+  clampCrop();
+  drawCrop(true);
+}
+
+function resetCrop() {
+  const s = cropState;
+  s.zoom = 1;
+  s.scale = s.min;
+  s.x = (cropW - s.image.naturalWidth * s.scale) / 2;
+  // Les visages sont rarement au centre exact : cadre placé un peu plus haut.
+  s.y = (cropH - s.image.naturalHeight * s.scale) * 0.35;
+  clampCrop();
+  drawCrop(true);
+}
+
+function cropPhoto(image) {
+  return new Promise(finish => {
+    cropState = {
+      image, finish, zoom: 1, x: 0, y: 0, scale: 1, pointers: new Map(),
+      min: Math.max(cropW / image.naturalWidth, cropH / image.naturalHeight)
+    };
+    el('crop-canvas').width = cropW;
+    el('crop-canvas').height = cropH;
+    el('cropper').hidden = false;
+    resetCrop();
+    el('crop-canvas').focus();
+  });
+}
+
+function cropPoint(event) {
+  const rect = el('crop-canvas').getBoundingClientRect();
+  return { x: (event.clientX - rect.left) * cropW / rect.width, y: (event.clientY - rect.top) * cropH / rect.height };
+}
+
+(() => {
+  const canvas = el('crop-canvas');
+  const distance = () => {
+    const [a, b] = [...cropState.pointers.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  };
+  canvas.addEventListener('pointerdown', event => {
+    if (!cropState) return;
+    canvas.setPointerCapture(event.pointerId);
+    cropState.pointers.set(event.pointerId, cropPoint(event));
+    if (cropState.pointers.size === 2) cropState.pinch = { d: distance(), zoom: cropState.zoom };
+  });
+  canvas.addEventListener('pointermove', event => {
+    const s = cropState;
+    if (!s || !s.pointers.has(event.pointerId)) return;
+    const point = cropPoint(event);
+    if (s.pointers.size === 2 && s.pinch) {
+      s.pointers.set(event.pointerId, point);
+      zoomCrop(s.pinch.zoom * distance() / s.pinch.d);
+      return;
+    }
+    const before = s.pointers.get(event.pointerId);
+    s.x += point.x - before.x;
+    s.y += point.y - before.y;
+    s.pointers.set(event.pointerId, point);
+    clampCrop();
+    drawCrop(true);
+  });
+  for (const type of ['pointerup', 'pointercancel']) {
+    canvas.addEventListener(type, event => {
+      if (!cropState) return;
+      cropState.pointers.delete(event.pointerId);
+      cropState.pinch = undefined;
+    });
+  }
+  canvas.addEventListener('wheel', event => {
+    if (!cropState) return;
+    event.preventDefault();
+    const point = cropPoint(event);
+    zoomCrop(cropState.zoom * (event.deltaY < 0 ? 1.08 : 1 / 1.08), point.x, point.y);
+  }, { passive: false });
+  canvas.addEventListener('keydown', event => {
+    const s = cropState;
+    if (!s) return;
+    const step = 12;
+    const moves = { ArrowLeft: [step, 0], ArrowRight: [-step, 0], ArrowUp: [0, step], ArrowDown: [0, -step] };
+    if (moves[event.key]) {
+      s.x += moves[event.key][0];
+      s.y += moves[event.key][1];
+    } else if (event.key === '+' || event.key === '=') {
+      zoomCrop(s.zoom * 1.1);
+      event.preventDefault();
+      return;
+    } else if (event.key === '-') {
+      zoomCrop(s.zoom / 1.1);
+      event.preventDefault();
+      return;
+    } else return;
+    event.preventDefault();
+    clampCrop();
+    drawCrop(true);
+  });
+  el('crop-zoom').addEventListener('input', event => { if (cropState) zoomCrop(Number(event.target.value)); });
+  el('crop-reset').addEventListener('click', () => { if (cropState) resetCrop(); });
+  el('crop-cancel').addEventListener('click', () => closeCropper(null));
+  el('crop-ok').addEventListener('click', () => {
+    if (!cropState) return;
+    drawCrop(false);
+    closeCropper(el('crop-canvas').toDataURL('image/jpeg', 0.85));
+  });
+})();
 
 async function selectPhoto(input) {
   pickerOpenedAt = 0;
@@ -458,8 +643,15 @@ async function selectPhoto(input) {
   el('save-student').disabled = true;
   status.textContent = 'Préparation de la photo…';
   try {
-    const photo = await resizeImage(file);
+    const image = await loadImage(file);
     if (selection !== photoSelection) return;
+    status.textContent = 'Place le visage dans l’ovale.';
+    const photo = await cropPhoto(image);
+    if (selection !== photoSelection) return;
+    if (!photo) {
+      status.textContent = 'Photo non modifiée.';
+      return;
+    }
     draftPhoto = photo;
     showPhoto(photo);
     status.textContent = 'Photo prête. Enregistre la fiche pour la conserver.';
@@ -548,7 +740,12 @@ for (const type of ['pointerdown', 'keydown', 'scroll']) {
 window.addEventListener('pagehide', lock);
 window.addEventListener('pageshow', event => { if (event.persisted) checkYearOnReturn(); });
 
+el('zoom').addEventListener('click', closeZoom);
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !el('zoom').hidden) closeZoom();
+});
 el('back').addEventListener('click', () => {
+  closeZoom();
   if (busy) return;
   resetStudentForm();
   el('manage').open = el('class-options').open = false;
