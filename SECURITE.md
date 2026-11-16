@@ -1,4 +1,4 @@
-# Audit de sécurité — Trombinoscope (V4.1)
+# Audit de sécurité — Trombinoscope (V4.2)
 
 Audit du dépôt `cvitre23/Tonbinoscope-V1.0`, branche `main`, commit `2fa5f47` (« V3.2 stable », 10/11/2026), puis corrections apportées en V3.3.
 
@@ -87,5 +87,5 @@ Le format de l'enregistrement chiffré est **inchangé** : les données de test 
 3. Information des familles et, si l'établissement l'exige, accord pour la photographie.
 4. Restriction de captures d'écran par la gestion des iPad (MDM) : à demander au service informatique si l'établissement le souhaite (non faisable depuis l'application).
 
-## 9. Changements de la V4.1 (interface)
-Écran d'utilisation épuré : bouton « Classes » ouvrant une fenêtre qui ne liste que les classes, portraits en haut, gestion des classes/fiches et sécurité repliées. Aucun changement de chiffrement, de stockage ni de réseau.
+## 9. Changements de la V4.2 (interface)
+Écran d'accueil avec une icône par classe ; un appui ouvre le trombinoscope de la classe (bouton « Classes » pour revenir). Ajout de classes, gestion des fiches et sécurité repliés. Aucun changement de chiffrement, de stockage ni de réseau.

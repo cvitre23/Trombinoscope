@@ -54,15 +54,14 @@ form button, #reset { justify-self: start; margin-top: .2rem; }
 #rename-class { margin-top: .9rem; }
 .card img, .avatar { width: 96px; height: 96px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.classes-toggle { display: inline-flex; align-items: center; gap: .55rem; font-size: 1.05rem; }
-.classes-toggle .chevron { transition: transform .15s; }
-.classes-toggle[aria-expanded="true"] .chevron { transform: rotate(180deg); }
-.classes-window { margin-block: .25rem .9rem; }
-.class-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .5rem; }
-.class-list button { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: .5rem; text-align: left; background: #fff; color: #164d40; border-color: #668379; }
-.class-list button[aria-current="true"] { background: #215e4e; color: #fff; border-color: #215e4e; }
-.class-list .count { font-weight: 500; opacity: .8; }
-#class-title { margin-top: .4rem; }
+#directory-title { flex: 1 1 auto; font-size: 1.5rem; }
+.section-head { gap: .75rem; flex-wrap: nowrap; }
+.tiles { list-style: none; margin: .5rem 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr)); gap: 1rem; }
+.tile { width: 100%; min-height: 9.5rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3rem; padding: 1rem .75rem; background: #fff; color: #164d40; border: 2px solid #cad8cf; border-radius: 1.2rem; }
+.tile:active { background: #e4f2e9; }
+.tile-icon { color: #215e4e; }
+.tile-name { font-size: 1.25rem; font-weight: 700; overflow-wrap: anywhere; }
+.tile-count { font-weight: 500; font-size: .92rem; color: #40594e; }
 .fold { margin-block: 1rem; }
 .fold summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
 .fold[open] summary { margin-bottom: .5rem; }
