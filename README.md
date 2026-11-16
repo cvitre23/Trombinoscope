@@ -1,8 +1,8 @@
-# Trombinoscope scolaire — V3.5
+# Trombinoscope scolaire — V4.0 (version de production)
 
 Application web installable (PWA) pour iPad : classes, fiches élèves et portraits, **stockés uniquement sur l'iPad et chiffrés** (AES-GCM 256, clé dérivée du mot de passe). Aucun serveur, fonctionne hors ligne.
 
-⚠️ Démonstration : **données fictives uniquement** tant que la sécurité n'est pas validée et que l'établissement n'a pas donné son accord.
+Version destinée aux données réelles des élèves, après accord de l'établissement. Aucune sauvegarde n'existe : un mot de passe oublié signifie des données perdues (d'où la confirmation du mot de passe à la création et ses 12 caractères minimum).
 
 - Audit et choix de sécurité : [`SECURITE.md`](SECURITE.md)
 - Procédure de test sur iPad : [`TESTS-IPAD.md`](TESTS-IPAD.md)
@@ -14,18 +14,18 @@ Application web installable (PWA) pour iPad : classes, fiches élèves et portra
 ## Déployer depuis Windows (sans Mac)
 
 ### Mise à jour par le site GitHub (le plus simple)
-1. Sur le PC, décompressez l'archive V3.5.
+1. Sur le PC, décompressez l'archive V4.0.
 2. Ouvrez https://github.com/cvitre23/Tonbinoscope-V1.0 → **Add file** → **Upload files**.
 3. Glissez **tous** les fichiers ci-dessus (plus `README.md`, `SECURITE.md`, `TESTS-IPAD.md`). Les fichiers de même nom sont remplacés.
-4. Message de commit : « Publier le Trombinoscope V3.5 » → **Commit changes** directement sur `main`.
+4. Message de commit : « Publier le Trombinoscope V4.0 » → **Commit changes** directement sur `main`.
 5. **Settings** → **Pages** : *Source* = « Deploy from a branch », branche `main`, dossier `/ (root)` (déjà configuré si la V3.2 est en ligne).
 6. Onglet **Actions** : attendez que « pages build and deployment » soit vert (1 à 2 minutes).
-7. Ouvrez l'adresse du site dans Edge/Chrome sur le PC : l'en-tête doit afficher « V3.5 ». Faites Ctrl+F5 si besoin.
+7. Ouvrez l'adresse du site dans Edge/Chrome sur le PC : l'en-tête doit afficher « V4.0 ». Faites Ctrl+F5 si besoin.
 
 Ne renommez pas le dépôt et ne changez pas le chemin du site : les données déjà présentes sur l'iPad sont liées à cette adresse.
 
 ### Variante : GitHub Desktop
-Installer GitHub Desktop → *Clone* du dépôt → copier les fichiers V3.5 dans le dossier → *Commit to main* → *Push origin*.
+Installer GitHub Desktop → *Clone* du dépôt → copier les fichiers V4.0 dans le dossier → *Commit to main* → *Push origin*.
 
 ### Installer sur l'iPad
 1. Ouvrez l'adresse HTTPS du site dans **Safari**.

@@ -1,5 +1,5 @@
 const prefix = 'trombinoscope-demo:' + self.registration.scope + ':';
-const cacheName = prefix + 'v3.5';
+const cacheName = prefix + 'v4.0';
 const files = [
   './', './index.html', './styles.css', './app.js', './vault.js', './passkey.js',
   './manifest.webmanifest', './icon-180.png', './icon-192.png', './icon-512.png'

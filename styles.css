@@ -52,7 +52,6 @@ form button, #reset { justify-self: start; margin-top: .2rem; }
 .card img { display: block; margin: 0 auto .45rem; width: 80px; height: 80px; object-fit: cover; border-radius: 50%; background: #e4f2e9; }
 .avatar { display: grid; place-items: center; margin: 0 auto .45rem; width: 80px; height: 80px; border-radius: 50%; background: #d8ece0; font-size: 2.35rem; }
 #rename-class { margin-top: .9rem; }
-.test-zone { margin-top: 1.5rem; border-style: dashed; }
 .card img, .avatar { width: 120px; height: 120px; }
 .portrait { position: relative; display: block; width: 120px; height: 120px; overflow: hidden; border-radius: .6rem; margin-block: .4rem; }
 .portrait.round { border-radius: 50%; margin: 0 auto .45rem; }
