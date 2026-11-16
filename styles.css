@@ -53,3 +53,19 @@ form button, #reset { justify-self: start; margin-top: .2rem; }
 .avatar { display: grid; place-items: center; margin: 0 auto .45rem; width: 80px; height: 80px; border-radius: 50%; background: #d8ece0; font-size: 2.35rem; }
 #rename-class { margin-top: .9rem; }
 .card img, .avatar { width: 96px; height: 96px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.classes-toggle { display: inline-flex; align-items: center; gap: .55rem; font-size: 1.05rem; }
+.classes-toggle .chevron { transition: transform .15s; }
+.classes-toggle[aria-expanded="true"] .chevron { transform: rotate(180deg); }
+.classes-window { margin-block: .25rem .9rem; }
+.class-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: .5rem; }
+.class-list button { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: .5rem; text-align: left; background: #fff; color: #164d40; border-color: #668379; }
+.class-list button[aria-current="true"] { background: #215e4e; color: #fff; border-color: #215e4e; }
+.class-list .count { font-weight: 500; opacity: .8; }
+#class-title { margin-top: .4rem; }
+.fold { margin-block: 1rem; }
+.fold summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+.fold[open] summary { margin-bottom: .5rem; }
+.fold .columns { margin-bottom: 0; }
+.fold .columns > section { border: 1px solid #cad8cf; border-radius: 1rem; padding: 1rem; }
+.fold #passkey-panel { margin-block: 0 1rem; }

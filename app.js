@@ -53,7 +53,10 @@ function lock() {
   directory = key = activeClass = undefined;
   for (const id of ['unlock', 'add-class']) el(id).reset();
   resetStudentForm();
-  for (const id of ['students', 'classes']) el(id).replaceChildren();
+  for (const id of ['students', 'classes', 'class-list']) el(id).replaceChildren();
+  setClassesWindow(false);
+  el('manage').open = false;
+  el('security').open = false;
   for (const id of ['class-title', 'empty']) el(id).textContent = '';
   if (db) showLock();
   say('');
@@ -65,6 +68,39 @@ function showPhoto(photo) {
   else preview.removeAttribute('src');
   preview.hidden = !photo;
   el('remove-photo').hidden = !photo;
+}
+
+function setClassesWindow(open) {
+  el('classes-window').hidden = !open;
+  el('classes-toggle').setAttribute('aria-expanded', String(open));
+}
+
+function selectClass(id) {
+  if (busy) return;
+  resetStudentForm();
+  activeClass = id;
+  setClassesWindow(false);
+  showDirectory();
+}
+
+function renderClassList(current) {
+  el('classes-toggle-label').textContent = current ? current.name : 'Classes';
+  el('class-list').replaceChildren(...directory.map(group => {
+    const item = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    if (group.id === current?.id) button.setAttribute('aria-current', 'true');
+    const label = document.createElement('span');
+    label.textContent = group.name;
+    const count = document.createElement('span');
+    count.className = 'count';
+    count.textContent = String(group.students.length);
+    count.setAttribute('aria-label', group.students.length + ' élèves');
+    button.append(label, count);
+    button.addEventListener('click', () => selectClass(group.id));
+    item.append(button);
+    return item;
+  }));
 }
 
 function fillClassSelect(select, selected) {
@@ -107,6 +143,8 @@ function showDirectory() {
   el('classes').replaceChildren(...directory.map(group => new Option(group.name, group.id)));
   if (current) el('classes').value = current.id;
   el('classes').disabled = !current;
+  renderClassList(current);
+  if (!current) el('manage').open = true;
   el('remove-class').hidden = !current;
   el('rename-class').hidden = !current;
   el('rename-class-name').value = current?.name || '';
@@ -140,6 +178,8 @@ function showDirectory() {
     edit.addEventListener('click', () => {
       if (busy) return;
       resetStudentForm(student);
+      el('manage').open = true;
+      el('student-panel').scrollIntoView({ block: 'center' });
       el('first-name').focus();
     });
     const remove = document.createElement('button');
@@ -520,10 +560,17 @@ el('classes').addEventListener('change', event => {
     event.target.value = activeClass;
     return;
   }
-  resetStudentForm();
-  activeClass = event.target.value;
-  showDirectory();
+  selectClass(event.target.value);
   el('classes').focus();
+});
+el('classes-toggle').addEventListener('click', () => {
+  setClassesWindow(el('classes-window').hidden);
+});
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !el('classes-window').hidden) {
+    setClassesWindow(false);
+    el('classes-toggle').focus();
+  }
 });
 el('add-class').addEventListener('submit', event => {
   event.preventDefault();
