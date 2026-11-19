@@ -1,4 +1,4 @@
-# Audit de sécurité — Trombinoscope (V4.4)
+# Audit de sécurité — Trombinoscope (V4.5)
 
 Audit du dépôt `cvitre23/Tonbinoscope-V1.0`, branche `main`, commit `2fa5f47` (« V3.2 stable », 10/11/2026), puis corrections apportées en V3.3.
 
@@ -95,3 +95,6 @@ Photos recadrées automatiquement en ovale 3:4 (option décochable pour un cadra
 
 ## 11. Changements de la V4.4
 Recadrage manuel des photos : après le choix de la photo, une fenêtre affiche un ovale en filigrane ; on déplace et on zoome la photo (glisser, pincer, curseur, clavier) puis on valide. Traitement local dans un canvas ; la fenêtre se ferme au verrouillage. Remplace l'option de recadrage automatique de la V4.3. Aucun changement de chiffrement, de stockage ni de réseau.
+
+## 12. Changements de la V4.5 (interface)
+Après le déverrouillage, l'écran d'accueil n'affiche que les vignettes de classes : dégradés de couleur et icône en trait choisies par classe. Un appui ouvre la classe : cartes épurées des élèves, sans réglages visibles. Un bouton discret (crayon) donne accès à l'ajout/modification des fiches et aux options de la classe ; le bouton « Réglages » de l'accueil donne accès à l'ajout de classes et à la sécurité. Sans photo, la carte affiche les initiales. Aucun changement de chiffrement, de stockage ni de réseau.
