@@ -6,6 +6,45 @@ import { createPasskey, readPasskey, protectKey, recoverKey } from './passkey.js
 
 const el = id => document.getElementById(id);
 const say = message => { el('message').textContent = message; };
+const classColors = 8;
+const svgNs = 'http://www.w3.org/2000/svg';
+// Icônes en trait (24x24), une par classe.
+const classIcons = [
+  ['M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z', 'M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z'],
+  ['M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z'],
+  ['M9 18V5l12-2v13', 'M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', 'M18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'],
+  ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z', 'M2 12h20', 'M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z'],
+  ['M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z'],
+  ['M13 2L3 14h9l-1 8 10-12h-9z'],
+  ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z', 'M16.2 7.8l-2 6.4-6.4 2 2-6.4z'],
+  ['M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10z', 'M12 1v2', 'M12 21v2', 'M4.2 4.2l1.4 1.4', 'M18.4 18.4l1.4 1.4', 'M1 12h2', 'M21 12h2', 'M4.2 19.8l1.4-1.4', 'M18.4 5.6l1.4-1.4'],
+  ['M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z', 'M4 22v-7'],
+  ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z', 'M8 14s1.5 2 4 2 4-2 4-2', 'M9 9h.01', 'M15 9h.01'],
+  ['M12 2L2 7l10 5 10-5z', 'M2 17l10 5 10-5', 'M2 12l10 5 10-5'],
+  ['M3 3h7v7H3z', 'M14 3h7v7h-7z', 'M14 14h7v7h-7z', 'M3 14h7v7H3z']
+];
+function iconSvg(index, size) {
+  const svg = document.createElementNS(svgNs, 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '1.8');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const d of classIcons[index % classIcons.length]) {
+    const path = document.createElementNS(svgNs, 'path');
+    path.setAttribute('d', d);
+    svg.append(path);
+  }
+  return svg;
+}
+function initials(name) {
+  const parts = name.trim().split(/[\s-]+/).filter(Boolean);
+  return ((parts[0]?.[0] || '?') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+}
 const avatars = ['🦊', '🐼', '🐸', '🦉', '🐱', '🐻', '🐰', '🐨'];
 let db;
 let record;
@@ -56,7 +95,9 @@ function lock() {
   for (const id of ['unlock', 'add-class']) el(id).reset();
   resetStudentForm();
   for (const id of ['students', 'class-tiles']) el(id).replaceChildren();
-  for (const id of ['manage', 'class-options', 'security', 'add-class-fold']) el(id).open = false;
+  for (const id of ['manage', 'class-options', 'security']) el(id).open = false;
+  setSettings(false);
+  setTools(false);
   el('empty').textContent = '';
   el('directory-title').textContent = 'Mes classes';
   if (db) showLock();
@@ -88,7 +129,45 @@ function openZoom(student) {
   zoomTimer = setTimeout(closeZoom, 3000);
 }
 
+function setTools(open) {
+  el('class-tools').hidden = !open;
+  el('tools-toggle').setAttribute('aria-expanded', String(open));
+  el('class-view').classList.toggle('editing', open);
+  if (open) el('manage').open = true;
+}
+
+function setSettings(open) {
+  el('settings').hidden = !open;
+  el('settings-toggle').setAttribute('aria-expanded', String(open));
+}
+
+const colorOf = (group, index) => Number.isInteger(group.color) ? group.color % classColors : index % classColors;
+const iconOf = (group, index) => Number.isInteger(group.icon) ? group.icon % classIcons.length : index % classIcons.length;
+
+function buildPicker(container, kind, name) {
+  const items = kind === 'color' ? Array.from({ length: classColors }, (_, i) => i) : classIcons.map((_, i) => i);
+  container.replaceChildren(...items.map(i => {
+    const label = document.createElement('label');
+    label.className = kind === 'color' ? 'swatch c' + i : 'swatch emoji';
+    const input = document.createElement('input');
+    input.type = 'radio';
+    input.name = name;
+    input.value = String(i);
+    const face = document.createElement('span');
+    if (kind === 'icon') face.append(iconSvg(i, 24));
+    label.setAttribute('aria-label', (kind === 'color' ? 'Couleur ' : 'Icône ') + (i + 1));
+    label.append(input, face);
+    return label;
+  }));
+}
+
+function setPicker(form, name, value) {
+  form.elements[name].value = String(value);
+}
+
 function selectClass(id) {
+  setSettings(false);
+  setTools(false);
   if (busy) return;
   resetStudentForm();
   el('manage').open = el('class-options').open = false;
@@ -104,13 +183,18 @@ function renderTiles() {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'tile';
+    const index = directory.indexOf(group);
+    button.className = 'tile c' + colorOf(group, index);
+    const emoji = document.createElement('span');
+    emoji.className = 'tile-emoji';
+    emoji.append(iconSvg(iconOf(group, index), 34));
     const name = document.createElement('span');
     name.className = 'tile-name';
     name.textContent = group.name;
     const count = document.createElement('span');
     count.className = 'tile-count';
     count.textContent = group.students.length + (group.students.length > 1 ? ' élèves' : ' élève');
-    button.append(el('tile-icon').content.cloneNode(true), name, count);
+    button.append(emoji, name, count);
     button.addEventListener('click', () => selectClass(group.id));
     item.append(button);
     return item;
@@ -157,11 +241,25 @@ function showDirectory() {
   el('home').hidden = !!current;
   el('class-view').hidden = !current;
   el('back').hidden = !current;
-  el('directory-title').textContent = current?.name || 'Mes classes';
+  el('directory-title').replaceChildren(...(current ? [iconSvg(iconOf(current, directory.indexOf(current)), 24), document.createTextNode(' ' + current.name)] : [document.createTextNode('Mes classes')]));
+  el('directory-title').className = current ? 'title-pill c' + colorOf(current, directory.indexOf(current)) : '';
   renderTiles();
   el('empty-home').hidden = directory.length > 0;
-  if (!directory.length) el('add-class-fold').open = true;
+  el('settings-toggle').hidden = !!current;
+  el('tools-toggle').hidden = !current;
+  el('class-view').className = current ? 'c' + colorOf(current, directory.indexOf(current)) : '';
+  el('class-view').classList.toggle('editing', !el('class-tools').hidden);
+  if (!directory.length) setSettings(true);
+  if (!el('class-name').value || !el('add-class').elements['add-color'].value) {
+    setPicker(el('add-class'), 'add-color', directory.length % classColors);
+    setPicker(el('add-class'), 'add-icon', directory.length % classIcons.length);
+  }
   el('rename-class-name').value = current?.name || '';
+  if (current) {
+    const index = directory.indexOf(current);
+    setPicker(el('rename-class'), 'edit-color', colorOf(current, index));
+    setPicker(el('rename-class'), 'edit-icon', iconOf(current, index));
+  }
   if (!editingStudent) fillClassSelect(el('student-class'), current?.id);
   el('idle-minutes').textContent = idleMinutes;
   el('purge-date').textContent = '1er août ' + nextPurge().getFullYear();
@@ -188,7 +286,7 @@ function showDirectory() {
     } else {
       portrait.className = 'avatar';
       portrait.setAttribute('aria-hidden', 'true');
-      portrait.textContent = avatars[student.avatar];
+      portrait.textContent = initials(student.name);
     }
     const name = document.createElement('p');
     name.textContent = student.name;
@@ -200,7 +298,7 @@ function showDirectory() {
     edit.addEventListener('click', () => {
       if (busy) return;
       resetStudentForm(student);
-      el('manage').open = true;
+      setTools(true);
       el('student-panel').scrollIntoView({ block: 'center' });
       el('first-name').focus();
     });
@@ -218,7 +316,10 @@ function showDirectory() {
         resetStudentForm();
       }
     }));
-    card.append(portrait, name, edit, remove);
+    const actions = document.createElement('div');
+    actions.className = 'card-actions';
+    actions.append(edit, remove);
+    card.append(portrait, name, actions);
     return card;
   }));
 }
@@ -744,6 +845,12 @@ el('zoom').addEventListener('click', closeZoom);
 document.addEventListener('keydown', event => {
   if (event.key === 'Escape' && !el('zoom').hidden) closeZoom();
 });
+buildPicker(el('add-colors'), 'color', 'add-color');
+buildPicker(el('add-icons'), 'icon', 'add-icon');
+buildPicker(el('edit-colors'), 'color', 'edit-color');
+buildPicker(el('edit-icons'), 'icon', 'edit-icon');
+el('tools-toggle').addEventListener('click', () => setTools(el('class-tools').hidden));
+el('settings-toggle').addEventListener('click', () => setSettings(el('settings').hidden));
 el('back').addEventListener('click', () => {
   closeZoom();
   if (busy) return;
@@ -759,8 +866,16 @@ el('add-class').addEventListener('submit', event => {
   run(async token => {
     const name = el('class-name').value.trim();
     if (!name) throw new Error('Saisis un nom de classe.');
-    const group = { id: crypto.randomUUID(), name, students: [] };
-    if (await save([...directory, group], token, undefined, 'Classe ajoutée.')) event.target.reset();
+    const form = event.target;
+    const group = {
+      id: crypto.randomUUID(), name, students: [],
+      color: Number(form.elements['add-color'].value), icon: Number(form.elements['add-icon'].value)
+    };
+    if (await save([...directory, group], token, undefined, 'Classe ajoutée.')) {
+      form.reset();
+      setPicker(form, 'add-color', directory.length % classColors);
+      setPicker(form, 'add-icon', directory.length % classIcons.length);
+    }
   });
 });
 el('remove-class').addEventListener('click', () => run(async token => {
@@ -773,8 +888,10 @@ el('rename-class').addEventListener('submit', event => {
   run(async token => {
     const name = el('rename-class-name').value.trim();
     if (!name) throw new Error('Saisis un nom de classe.');
-    const next = directory.map(group => group.id === activeClass ? { ...group, name } : group);
-    await save(next, token, activeClass, 'Classe renommée.');
+    const form = event.target;
+    const style = { color: Number(form.elements['edit-color'].value), icon: Number(form.elements['edit-icon'].value) };
+    const next = directory.map(group => group.id === activeClass ? { ...group, name, ...style } : group);
+    await save(next, token, activeClass, 'Classe modifiée.');
   });
 });
 el('add-student').addEventListener('submit', event => {
